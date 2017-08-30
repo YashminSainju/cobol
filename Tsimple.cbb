@@ -1,0 +1,113 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID.HELLO.
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+   SELECT STUDENT-FILE   ASSIGN TO "P2In.dat"
+      ORGANIZATION IS SEQUENTIAL.
+   SELECT PRINT-FILE    ASSIGN TO "P2Out.dat"
+      ORGANIZATION IS SEQUENTIAL.
+
+DATA DIVISION.
+FILE SECTION.
+FD  STUDENT-FILE.
+01  inRecord.
+   02 IN-STUDENT-NAME PIC X(25).
+   02 IN-STUDENT-NUMBER PIC X(8).
+   02 IN-TERM PIC X(6).
+   02 IN-YEAR PIC 9(4).
+   02 IN-COURSE PIC X(11).
+   02 IN-TITLE PIC X(30).
+   02 IN-GR PIC X.
+   02 IN-EARNED PIC 9(2)V99.
+
+FD PRINT-FILE.
+01 outRecord.
+   02 STUDENT-NAME PIC X(25).
+   02 STUDENT-NUMBER PIC X(8).
+   02 TERM PIC X(6).
+   02 YEAR PIC 9(4).
+   02 COURSE PIC X(11).
+   02 TITLE PIC X(30).
+   02 GR PIC XX.
+   02 EARNED PIC 9(2)V99.
+   02 QPOINTS PIC 9(2)V99.
+   02 SEMESTER-EARNED PIC 9(2)V99.
+   02 SEMESTER-QPTS PIC 9(2)V99.
+   02 SEMESTER-GPA PIC 9V99.
+   02 CUMULATIVE-EARNED PIC 9(2)V99.
+   02 CUMULATIVE-QPTS PIC 9(2)V99.
+   02 CUMULATIVE-GPA PIC 9V99.
+
+WORKING-STORAGE SECTION.
+01 w PIC X(3) VALUE "YES".
+01  WS-STUDENT.
+   02 WS-STUDENT-NAME PIC X(25).
+   02 WS-STUDENT-NUMBER PIC X(8).
+   02 WS-TERM PIC X(6).
+   02 WS-YEAR PIC 9(4).
+   02 WS-COURSE PIC X(11).
+   02 WS-TITLE PIC X(30).
+   02 WS-GR PIC X.
+   02 WS-EARNED PIC 9(2)V99.
+
+PROCEDURE DIVISION.
+    OPEN INPUT STUDENT-FILE.
+    OPEN OUTPUT PRINT-FILE.
+    PERFORM operation
+    PERFORM UNTIL w = "NO"
+                MOVE IN-STUDENT-NAME TO STUDENT-NAME
+                MOVE IN-STUDENT-NUMBER TO STUDENT-NUMBER
+                MOVE IN-TERM TO TERM
+                MOVE IN-YEAR TO YEAR
+                MOVE IN-COURSE TO COURSE
+                MOVE IN-TITLE TO TITLE
+                MOVE IN-GR TO GR
+                MOVE IN-EARNED TO EARNED
+                IF GR = 'A'
+                        THEN COMPUTE QPOINTS = 4*EARNED
+                        ELSE IF GR = 'B'
+                        THEN COMPUTE QPOINTS = 3*EARNED
+                        ELSE IF GR = 'C'
+                        THEN COMPUTE QPOINTS = 2*EARNED
+                        ELSE IF GR = 'D'
+                        THEN COMPUTE QPOINTS = EARNED
+                        ELSE
+                        COMPUTE QPOINTS = 0
+                END-IF
+                DISPLAY "                       SOUTHEASTERN LOUISIANA UNIVERSITY               "
+                DISPLAY "                               HAMMOND,LA 70402                        "
+                DISPLAY STUDENT-NAME
+                DISPLAY STUDENT-NUMBER
+                DISPLAY TERM," "
+                        ,YEAR
+                DISPLAY COURSE
+                        ,TITLE
+                        ,GR
+                        ,EARNED
+                        ,QPOINTS
+                WRITE outRecord
+		PERFORM operation
+                END-PERFORM.
+                CLOSE STUDENT-FILE.
+                CLOSE PRINT-FILE.
+                STOP RUN.
+        operation.
+                READ STUDENT-FILE INTO WS-STUDENT
+                        AT END
+                                MOVE "NO" TO w
+                        NOT AT END
+                                DISPLAY "                       SOUTHEASTERN LOUISIANA UNIVERSITY               "
+                                DISPLAY "                               HAMMOND,LA 70402                        "
+                                DISPLAY WS-STUDENT-NAME
+                                DISPLAY WS-STUDENT-NUMBER
+                                DISPLAY " "
+                                DISPLAY WS-TERM, " "
+                                        ,WS-YEAR
+                                DISPLAY WS-COURSE
+                                        ,WS-TITLE
+                                        ,WS-GR
+                                        ,WS-EARNED
+                END-READ.
+
